@@ -205,7 +205,7 @@ public class DynamoDBTableReplicator {
 					indexColumns.add(columnName);
 				}
 
-				tableSchema.addIndex(indexName, indexColumns);
+				tableSchema.addIndex(dynamoTableName + '_' + indexName, indexColumns);
 			}
 		}
 
