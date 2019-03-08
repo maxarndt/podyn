@@ -25,6 +25,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBStreams;
@@ -89,6 +90,10 @@ public class DynamoDBReplicator {
 		maxScanRateOption.setRequired(false);
 		options.addOption(maxScanRateOption);
 
+		Option dynamoEndpointOption = new Option("e", "ddb-endpoint", true, "DynamoDB endpoint");
+		dynamoEndpointOption.setRequired(false);
+		options.addOption(dynamoEndpointOption);
+
 		CommandLineParser parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();
 		formatter.setWidth(120);
@@ -113,6 +118,7 @@ public class DynamoDBReplicator {
 			String tableNamesString = cmd.getOptionValue("table");
 			String postgresURL = cmd.getOptionValue("postgres-jdbc-url");
 			String conversionModeString = cmd.getOptionValue("conversion-mode", ConversionMode.columns.name());
+			String ddbEndpoint = cmd.getOptionValue("ddb-endpoint");
 
 			ConversionMode conversionMode;
 
@@ -124,13 +130,20 @@ public class DynamoDBReplicator {
 
 			AWSCredentialsProvider credentialsProvider = new DefaultAWSCredentialsProviderChain();
 
-			AmazonDynamoDB dynamoDBClient = AmazonDynamoDBClientBuilder.standard().
-					withCredentials(credentialsProvider).
-					build();
+			AmazonDynamoDBClientBuilder dynamoDBBuilder = AmazonDynamoDBClientBuilder.standard().
+					withCredentials(credentialsProvider);
 
-			AmazonDynamoDBStreams streamsClient = AmazonDynamoDBStreamsClientBuilder.standard().
-					withCredentials(credentialsProvider).
-					build();
+			AmazonDynamoDBStreamsClientBuilder streamsBuilder = AmazonDynamoDBStreamsClientBuilder.standard().
+					withCredentials(credentialsProvider);
+
+			if (ddbEndpoint != null) {
+				AwsClientBuilder.EndpointConfiguration endpoint = new AwsClientBuilder.EndpointConfiguration(ddbEndpoint, "");
+				dynamoDBBuilder.withEndpointConfiguration(endpoint);
+				streamsBuilder.withEndpointConfiguration(endpoint);
+			}
+
+			AmazonDynamoDB dynamoDBClient = dynamoDBBuilder.build();
+			AmazonDynamoDBStreams streamsClient = streamsBuilder.build();
 
 			final TableEmitter emitter;
 
