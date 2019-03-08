@@ -137,7 +137,7 @@ public class DynamoDBReplicator {
 					withCredentials(credentialsProvider);
 
 			if (ddbEndpoint != null) {
-				AwsClientBuilder.EndpointConfiguration endpoint = new AwsClientBuilder.EndpointConfiguration(ddbEndpoint, "");
+				AwsClientBuilder.EndpointConfiguration endpoint = new AwsClientBuilder.EndpointConfiguration(ddbEndpoint, System.getenv().get("AWS_REGION"));
 				dynamoDBBuilder.withEndpointConfiguration(endpoint);
 				streamsBuilder.withEndpointConfiguration(endpoint);
 			}
