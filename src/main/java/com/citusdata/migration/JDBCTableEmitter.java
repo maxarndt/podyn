@@ -73,26 +73,31 @@ public class JDBCTableEmitter implements TableEmitter {
 	final PreparedStatement describeTableStatement;
 	final PreparedStatement hasCitusStatement;
 	final PreparedStatement distributionColumnStatement;
+	final boolean escapePeriods;
 
-	public JDBCTableEmitter(String url) throws SQLException {
-		this(DriverManager.getConnection(url));
+	public JDBCTableEmitter(String url, boolean escapePeriods) throws SQLException {
+		this(DriverManager.getConnection(url), escapePeriods);
 	}
 	
-	public JDBCTableEmitter(Connection connection) throws SQLException {
+	public JDBCTableEmitter(Connection connection, boolean escapePeriods) throws SQLException {
 		this.currentConnection = connection;
 		this.describeTableStatement = currentConnection.prepareStatement(DESCRIBE_TABLE_SQL);
 		this.hasCitusStatement = currentConnection.prepareStatement(HAS_CITUS_SQL);
 		this.distributionColumnStatement = currentConnection.prepareStatement(DISTRIBUTION_COLUMN_SQL);
+		this.escapePeriods = escapePeriods;
 	}
 
 	public synchronized TableSchema fetchSchema(String tableName) {
 		try {
+			if (this.escapePeriods) {
+				tableName = tableName.replace('.', '_');
+			}
 			describeTableStatement.setString(1, tableName);
 
 			ResultSet describeTableResults = describeTableStatement.executeQuery();
 
 			if (describeTableResults.next()) {
-				TableSchema tableSchema = new TableSchema(tableName);
+				TableSchema tableSchema = new TableSchema(tableName, null, this.escapePeriods);
 				List<String> primaryKeyColumns = new ArrayList<>();
 
 				do {

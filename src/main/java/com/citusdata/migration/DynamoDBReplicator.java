@@ -82,6 +82,10 @@ public class DynamoDBReplicator {
 		lowerCaseColumnsOption.setRequired(false);
 		options.addOption(lowerCaseColumnsOption);
 
+		Option escapePeriodsOption = new Option("ep", "escape-periods", false, "Escape periods in table names");
+		escapePeriodsOption.setRequired(false);
+		options.addOption(escapePeriodsOption);
+
 		Option numConnectionsOption = new Option("n", "num-connections", true, "Database connection pool size (default 16)");
 		numConnectionsOption.setRequired(false);
 		options.addOption(numConnectionsOption);
@@ -113,6 +117,7 @@ public class DynamoDBReplicator {
 
 			boolean useCitus = cmd.hasOption("citus");
 			boolean useLowerCaseColumnNames = cmd.hasOption("lower-case-column-names");
+			boolean escapePeriods = cmd.hasOption("escape-periods");
 			int maxScanRate = Integer.parseInt(cmd.getOptionValue("scan-rate", "25"));
 			int dbConnectionCount = Integer.parseInt(cmd.getOptionValue("num-connections", "16"));
 			String tableNamesString = cmd.getOptionValue("table");
@@ -151,7 +156,7 @@ public class DynamoDBReplicator {
 				List<TableEmitter> emitters = new ArrayList<>();
 
 				for(int i = 0; i < dbConnectionCount; i++) {
-					emitters.add(new JDBCTableEmitter(postgresURL));
+					emitters.add(new JDBCTableEmitter(postgresURL, escapePeriods));
 				}
 
 				emitter = new HashedMultiEmitter(emitters);
@@ -190,6 +195,7 @@ public class DynamoDBReplicator {
 				replicator.setAddColumnEnabled(true);
 				replicator.setUseCitus(useCitus);
 				replicator.setUseLowerCaseColumnNames(useLowerCaseColumnNames);
+				replicator.setEscapePeriods(escapePeriods);
 				replicator.setConversionMode(conversionMode);
 
 				replicators.add(replicator);
