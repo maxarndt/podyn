@@ -268,8 +268,8 @@ public class DynamoDBTableReplicator {
 			}
 
 			// Account for the rest of the throughput we consumed, 
-			// now that we know how much that scan request cost 
-			double consumedCapacity = scanResult.getConsumedCapacity().getCapacityUnits();
+			// now that we know how much that scan request cost
+			double consumedCapacity = scanResult.getConsumedCapacity() != null ? scanResult.getConsumedCapacity().getCapacityUnits() : 0;
 			int permitsToConsume = (int)(consumedCapacity - 1.0);
 			if (permitsToConsume <= 0) {
 				permitsToConsume = 1;
