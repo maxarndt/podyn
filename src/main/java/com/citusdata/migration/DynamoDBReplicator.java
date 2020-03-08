@@ -203,6 +203,7 @@ public class DynamoDBReplicator {
 
 			if (replicateSchema) {
 				for(DynamoDBTableReplicator replicator : replicators) {
+                    if (replicator.schemaExisted) continue;
 					LOG.info(String.format("Constructing table schema for table %s", replicator.dynamoTableName));
 
 					replicator.replicateSchema();
@@ -213,6 +214,7 @@ public class DynamoDBReplicator {
 				List<Future<Long>> futureResults = new ArrayList<Future<Long>>();
 
 				for(DynamoDBTableReplicator replicator : replicators) {
+					if (replicator.schemaExisted) continue;
 					LOG.info(String.format("Replicating data for table %s", replicator.dynamoTableName));
 					Future<Long> futureResult = replicator.startReplicatingData(maxScanRate);
 					futureResults.add(futureResult);
