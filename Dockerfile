@@ -1,6 +1,7 @@
 FROM maven:3-jdk-8 as builder
 WORKDIR /app
-COPY . /app
+COPY /src /app/src
+COPY pom.xml /app/pom.xml
 RUN mvn package
 
 FROM openjdk:8
