@@ -1,2 +1,9 @@
 dependency-reduced-pom.xml
 target/*
+.vscode/
+.idea/
+.classpath
+.factorypath
+.project
+.settings/
+podyn.iml
