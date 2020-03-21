@@ -78,6 +78,10 @@ public class DynamoDBReplicator {
 		conversionModeOption.setRequired(false);
 		options.addOption(conversionModeOption);
 
+		Option jsonbRemoveEscapeCharsOption = new Option("re", "remove-escape-chars", false, "Remove escape characters in jsonb conversion mode");
+		jsonbRemoveEscapeCharsOption.setRequired(false);
+		options.addOption(jsonbRemoveEscapeCharsOption);
+
 		Option lowerCaseColumnsOption = new Option("lc", "lower-case-column-names", false, "Use lower case column names");
 		lowerCaseColumnsOption.setRequired(false);
 		options.addOption(lowerCaseColumnsOption);
@@ -116,6 +120,7 @@ public class DynamoDBReplicator {
 			}
 
 			boolean useCitus = cmd.hasOption("citus");
+			boolean removeEscapeCharsJsonb = cmd.hasOption("remove-escape-chars");
 			boolean useLowerCaseColumnNames = cmd.hasOption("lower-case-column-names");
 			boolean escapePeriods = cmd.hasOption("escape-periods");
 			int maxScanRate = Integer.parseInt(cmd.getOptionValue("scan-rate", "25"));
@@ -194,6 +199,7 @@ public class DynamoDBReplicator {
 
 				replicator.setAddColumnEnabled(true);
 				replicator.setUseCitus(useCitus);
+				replicator.setRemoveEscapeCharsJsonb(removeEscapeCharsJsonb);
 				replicator.setUseLowerCaseColumnNames(useLowerCaseColumnNames);
 				replicator.setEscapePeriods(escapePeriods);
 				replicator.setConversionMode(conversionMode);

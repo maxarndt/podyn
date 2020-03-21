@@ -25,12 +25,14 @@ Once you've built the JAR, you can run it as follows.
 usage: podyn
  -c,--changes                    Continuously replicate changes
  -d,--data                       Replicate the current data
- -e,--ddb-endpoint               DynamoDB endpoint
+ -e,--ddb-endpoint <arg>         DynamoDB endpoint
+ -ep,--escape-periods            Escape periods in table names
  -h,--help                       Show help
  -lc,--lower-case-column-names   Use lower case column names
  -m,--conversion-mode <arg>      Conversion mode, either columns or jsonb (default: columns)
  -n,--num-connections <arg>      Database connection pool size (default 16)
  -r,--scan-rate <arg>            Maximum reads/sec during scan (default 25)
+ -re,--remove-escape-chars       Remove escape characters in jsonb conversion mode
  -s,--schema                     Replicate the table schema
  -t,--table <arg>                DynamoDB table name(s) to replicate
  -u,--postgres-jdbc-url <arg>    PostgreSQL JDBC URL of the destination

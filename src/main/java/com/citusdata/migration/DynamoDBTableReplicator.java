@@ -88,6 +88,7 @@ public class DynamoDBTableReplicator {
 
 	boolean addColumnsEnabled;
 	boolean useCitus;
+	boolean removeEscapeCharsJsonb;
 	boolean useLowerCaseColumnNames;
 	boolean escapePeriods;
 	ConversionMode conversionMode;
@@ -110,6 +111,7 @@ public class DynamoDBTableReplicator {
 		this.dynamoTableName = tableName;
 		this.addColumnsEnabled = true;
 		this.useCitus = false;
+		this.removeEscapeCharsJsonb = false;
 		this.useLowerCaseColumnNames = false;
 		this.escapePeriods = false;
 		this.tableSchema = emitter.fetchSchema(this.dynamoTableName);
@@ -122,6 +124,10 @@ public class DynamoDBTableReplicator {
 
 	public void setAddColumnEnabled(boolean addColumnEnabled) {
 		this.addColumnsEnabled = addColumnEnabled;
+	}
+
+	public void setRemoveEscapeCharsJsonb(boolean removeEscapeCharsJsonb) {
+		this.removeEscapeCharsJsonb = removeEscapeCharsJsonb;
 	}
 
 	public void setUseLowerCaseColumnNames(boolean useLowerCaseColumnNames) {
@@ -551,8 +557,18 @@ public class DynamoDBTableReplicator {
             }
 		}
 
-		row.setValue("data", item.toJSON());
 
+		String jsonString = item.toJSON();
+
+		if (removeEscapeCharsJsonb) {
+			jsonString = jsonString.replace("\"{", "{");
+			jsonString = jsonString.replace("}\"", "}");
+			jsonString = jsonString.replace("\"[", "[");
+			jsonString = jsonString.replace("]\"", "]");
+			jsonString = jsonString.replace("\\\"", "\"");
+		}
+
+		row.setValue("data", jsonString);
 		return row;
 	}
 
