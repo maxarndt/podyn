@@ -551,7 +551,11 @@ public class DynamoDBTableReplicator {
 			}
 
             if (columnValue != null) {
-                item.with(keyName, columnValue.datum);
+            	if (columnValue.type.equals(TableColumnType.numeric)) {
+            		item.with(keyName, parseNumeric(columnValue));
+				} else {
+					item.with(keyName, columnValue.datum);
+				}
             } else {
                 item.with(keyName, null);
             }
@@ -570,6 +574,24 @@ public class DynamoDBTableReplicator {
 
 		row.setValue("data", jsonString);
 		return row;
+	}
+
+	public Object parseNumeric(TableColumnValue columnValue) {
+		try
+		{
+			Integer res = Integer.parseInt((String)columnValue.datum);
+			return res;
+		}
+		catch(Exception ex)
+		{
+			try {
+				Double res = Double.parseDouble((String)columnValue.datum);
+				return res;
+			}
+			catch (Exception exc) {
+				return columnValue.datum;
+			}
+		}
 	}
 
 	public TableRow rowWithColumnsFromDynamoRecord(Map<String,AttributeValue> dynamoItem) {
